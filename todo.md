@@ -1,0 +1,1 @@
+- [ ] move nav from LC1 to App
