@@ -5,15 +5,46 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 
 import './App.css'
 
-import { ConnectComponent as LC1ConnectComponent, addEventListener } from './LC1'
+import { addEventListener, mockUpdate } from './LC1'
 import { ErrorDescriptions, States, StateDescriptions } from './LC1Data'
+import { processData } from './LC1DataProcessor'
 
 import { AfrGauge } from './components/AfrGauge'
 import { WarmupGauge } from './components/WarmupGauge'
+import { Nav } from './components/Nav'
+
+
+
 
 
 function App() {
   const [state, setState] = useState({stateId: States.Unknown, afr: -1, warmup: -1, lambda: -1, errorCode: -1})
+
+  const worker = new Worker(new URL('./serialWorker', import.meta.url), {type: 'module'})
+  
+  worker.onmessage = (msg) => {
+    if (msg.data === 'connected') {
+      worker.postMessage('start')
+    }
+
+    if (msg.data.startsWith('rx:')) {
+      const [_,data] = msg.data.split(':')
+      processData(data)
+    }
+  }
+
+  
+
+
+
+  async function tryConnect() {
+    const port = await navigator.serial.requestPort()
+
+    if (!port) return;
+
+    worker.postMessage('connect')
+  }
+
 
   let displayComponent = getDisplayType()
 
@@ -51,6 +82,16 @@ function App() {
     setState(newState)
   }
 
+
+  async function handleNavEvent(navId) {
+    if (navId === 'connect') { 
+      tryConnect()
+    }
+    if (navId === 'gauge') {}
+    if (navId === 'graph') {}
+    if (navId === 'mockUpdate') mockUpdate()
+}
+
   addEventListener('update', updated)
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -71,10 +112,9 @@ function App() {
       <CssBaseline enableColorScheme />
         <div className="App">
           <span>Mode: {StateDescriptions[state.stateId]}</span>
-          <LC1ConnectComponent></LC1ConnectComponent>
           {displayComponent}
 
-
+          <Nav onNavEvent={handleNavEvent}></Nav>
         </div>
     </ThemeProvider>
   )

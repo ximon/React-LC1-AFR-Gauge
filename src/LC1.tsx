@@ -17,22 +17,9 @@ function dataProcessorUpdate(stateChange) {
     emit('update', {...stateChange})
 }
 
-function ConnectComponent(props) {
+
     
-    async function connect() {
-        try {
-            port = await navigator.serial.requestPort()
-
-            port.open({baudRate})
-        } catch(error) {
-            console.dir(error.message ?? error)
-        }
-
-        console.log(port)
-        console.log(port.getInfo())
-    }
-
-    function mockUpdate() {
+    export function mockUpdate() {
         processData(0xA2)
         processData(0x81)
         processData(0xE3)
@@ -43,7 +30,6 @@ function ConnectComponent(props) {
 
     function updated() {
 
-        
         //Warmup Gauge Testing
         //emit('update', {state:{stateId: States.Warmup, warmup: 55 }, prevState: { stateId: States.Unknown}})
         //return;
@@ -71,19 +57,6 @@ function ConnectComponent(props) {
         }
     }
 
-    function handleNavEvent(navId) {
-        if (navId === 'connect') connect()
-        if (navId === 'gauge') {}
-        if (navId === 'graph') {}
-        if (navId === 'mockUpdate') mockUpdate()
-    }
-
-    return (
-        <div>
-            <Nav onNavEvent={handleNavEvent}></Nav>
-        </div>
-    )
-}
 
 function emit(method: string, payload: object = {}) {
     const callback = eventListeners.get(method)
@@ -97,31 +70,8 @@ function addLC1EventListener(method: string, callback: Function) {
     eventListeners.set(method, callback)
 }
 
-async function readData(dataReadyCallback: Function) {
-
-    while (port.readable) {
-        const reader = port.readable.getReader()
-        try {
-          while (true) {
-            const { value, done } = await reader.read()
-
-            if (done) {
-              // |reader| has been canceled.
-              break
-            }
-            
-            dataReadyCallback(value) // Do something with |value|...
-          }
-        } catch (error) {
-          // Handle |error|...
-        } finally {
-          reader.releaseLock()
-        }
-      }
-}
 
 export {
-    ConnectComponent,
-    readData as ReadData,
+    //readData as ReadData,
     addLC1EventListener as addEventListener
 }
