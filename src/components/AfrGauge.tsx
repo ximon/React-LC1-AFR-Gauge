@@ -1,4 +1,4 @@
-import { AfrRange } from '../LC1Data'
+import { AfrRange } from '../services/LC1Data'
 
 import RadialGauge from 'react-canvas-gauges/dist/RadialGauge'
 

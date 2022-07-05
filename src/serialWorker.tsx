@@ -1,25 +1,18 @@
-let port
-
+let port: SerialPort
 
 onmessage = async function(msg) {
-
     if (msg.data === 'connect') {
         [port] = await navigator.serial.getPorts()
 
         console.log("connecting to port: ", port)
-        postMessage('connected')
-    }
 
-    if (msg.data === 'start') {
         port.open({baudRate: 19200})
         console.log("serial connected!")
 
-        await read()
-
-        postMessage('disconnected')
+        setTimeout(async () => {await read()}, 100)
     }
-
 }
+
 
 async function read() {
 
@@ -35,7 +28,11 @@ async function read() {
                     break
                 }
                 if (value) {
-                    postMessage(`rx:[${value}]`)
+                    const msg = {
+                        serialData: Array.from(value)
+                    }
+
+                    postMessage(msg)
                 }
             }
         } catch (error) {

@@ -21,17 +21,17 @@ function processData(data: number)
 
     if (waitingOnPackets())
     {
-        if (packetIndex == 0)
+        if (packetIndex === 0)
             wordCount = data & 0b00000001
         
-        if (packetIndex == 1)
+        if (packetIndex === 1)
         {
             wordCount += data & 0b01111111
             packetCount = (wordCount + 1) * 2         //+1 for the header word, * 2 for bytes
         }
 
         //if the incoming data isn't as expected then reset and wait
-        if (checkData != 0x00 && (data & checkData) != checkData)
+        if (checkData !== 0x00 && (data & checkData) !== checkData)
         {
             packet = []
             packetIndex = 0

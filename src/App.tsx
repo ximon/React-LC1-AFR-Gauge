@@ -1,48 +1,44 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 import './App.css'
 
-import { addEventListener, mockUpdate } from './LC1'
-import { ErrorDescriptions, States, StateDescriptions } from './LC1Data'
-import { processData } from './LC1DataProcessor'
+import { addEventListener, mockUpdate } from './services/LC1'
+import { ErrorDescriptions, States, StateDescriptions } from './services/LC1Data'
+import { processData } from './services/LC1DataProcessor'
 
 import { AfrGauge } from './components/AfrGauge'
 import { WarmupGauge } from './components/WarmupGauge'
 import { Nav } from './components/Nav'
+import { createWorker } from './serialWorkerHelper';
 
 
-
+const worker = createWorker(processData);
 
 
 function App() {
   const [state, setState] = useState({stateId: States.Unknown, afr: -1, warmup: -1, lambda: -1, errorCode: -1})
 
-  const worker = new Worker(new URL('./serialWorker', import.meta.url), {type: 'module'})
-  
-  worker.onmessage = (msg) => {
-    if (msg.data === 'connected') {
-      worker.postMessage('start')
-    }
-
-    if (msg.data.startsWith('rx:')) {
-      const [_,data] = msg.data.split(':')
-      processData(data)
-    }
-  }
-
-  
-
-
-
   async function tryConnect() {
-    const port = await navigator.serial.requestPort()
+    try {
+      const ports = await navigator.serial.getPorts()
 
-    if (!port) return;
+      //we've previously connected to a port, use it
+      if (ports.length === 1) {
+        worker.postMessage('connect')
+        return
+      }
 
-    worker.postMessage('connect')
+      const port = await navigator.serial.requestPort()
+
+      if (!port) return
+      
+      worker.postMessage('connect')
+    } catch (err) {
+      console.info(err)
+    }
   }
 
 
