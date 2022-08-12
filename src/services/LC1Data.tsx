@@ -13,6 +13,11 @@ export type State = {
     warmup?: number
 }
 
+export interface StateChange {
+	state: State,
+	prevState: State
+}
+
 export enum States {
 	Unknown = -1,
 	Normal = 0,
@@ -25,7 +30,7 @@ export enum States {
 	Reserved = 7
 }
 
-export const StateDescriptions = Object.freeze({
+export const StateDescriptions: Record<number,string> = Object.freeze({
 	[States.Unknown]: 'Unknown',
 	[States.Normal]: 'AFR',
 	[States.O2]: 'O2',
@@ -50,7 +55,7 @@ export enum Errors {
 	SupplyLow = 9
 }
 
-export const ErrorDescriptions = Object.freeze({
+export const ErrorDescriptions: Record<number,string> = Object.freeze({
 	[Errors.HeaterShort]: 'Heater Circuit Shorted',
 	[Errors.HeaterOpen]: 'Heater Circuit Open',
 	[Errors.PumpShort]: 'Pump Circuit Shorted',

@@ -2,7 +2,7 @@ import { AfrRange } from '../services/LC1Data'
 
 import RadialGauge from 'react-canvas-gauges/dist/RadialGauge'
 
-export function AfrGauge({afr}) {
+export function AfrGauge({afr}:{afr:number}) {
     const tickCount = (AfrRange.Max - AfrRange.Min) + 1
     const ticks = Array.from({length: tickCount}, (_, i) => (AfrRange.Min-1) + i+1)
 

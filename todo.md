@@ -1,1 +1,2 @@
 - [ ] move nav from LC1 to App
+- [ ] 1 second timeout to not connected mode

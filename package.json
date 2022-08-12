@@ -1,6 +1,7 @@
 {
   "name": "react-lc1-afr-gauge",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.9.3",
@@ -18,7 +19,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "parcel public/index.html"
+    "build": "tsc",
+    "start": "parcel public/index.html",
+    "test": "npm run build && web-test-runner \"src/**/*.test.js\" --node-resolve",
+    "testCoverage": "web-test-runner \"src/**/*.test.js\" --node-resolve --coverage"
   },
   "eslintConfig": {
     "extends": [
@@ -39,6 +43,10 @@
     ]
   },
   "devDependencies": {
+    "@esm-bundle/chai": "4.3.4",
+    "@types/node": "^18.0.1",
+    "@web/dev-server-esbuild": "^0.3.1",
+    "@web/test-runner": "^0.13.31",
     "parcel": "^2.6.2",
     "process": "^0.11.10"
   }

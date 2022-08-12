@@ -1,6 +1,6 @@
 import LinearGauge from 'react-canvas-gauges/dist/LinearGauge'
 
-export function WarmupGauge({warmup}) {
+export function WarmupGauge({warmup} : {warmup:number}) {
     const tickCount = 10
     const ticks = Array.from({length: tickCount + 1}, (_, i) => i * 10)
 

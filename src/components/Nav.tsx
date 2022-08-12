@@ -7,17 +7,21 @@ import SpeedIcon from '@mui/icons-material/Speed'
 import TimelineIcon from '@mui/icons-material/Timeline'
 import DataObjectIcon from '@mui/icons-material/DataObject'
 
-export function Nav({onNavEvent}) {
+type OnNavEventCallback = (navId: string) => void
+
+export function Nav({onNavEvent}:{onNavEvent: OnNavEventCallback}) {
   const [value, setValue] = React.useState(0);
 
 
-    function navIdFromIndex(index) {
+    function navIdFromIndex(index: number): string {
         switch(index) {
             case 0: return 'connect'
             case 1: return 'gauge'
             case 2: return 'graph'
             case 3: return 'mockUpdate'
         }
+
+        return ''
     }
 
   return (

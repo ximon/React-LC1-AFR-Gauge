@@ -6,7 +6,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import './App.css'
 
 import { addEventListener, mockUpdate } from './services/LC1'
-import { ErrorDescriptions, States, StateDescriptions } from './services/LC1Data'
+import { ErrorDescriptions, State, States, StateDescriptions, StateChange } from './services/LC1Data'
 import { processData } from './services/LC1DataProcessor'
 
 import { AfrGauge } from './components/AfrGauge'
@@ -18,8 +18,14 @@ import { createWorker } from './serialWorkerHelper';
 const worker = createWorker(processData);
 
 
+enum Mode {
+  Gauge,
+  Graph
+}
+
 function App() {
-  const [state, setState] = useState({stateId: States.Unknown, afr: -1, warmup: -1, lambda: -1, errorCode: -1})
+  const [state, setState] = useState<State>({stateId: States.Unknown, afr: -1, warmup: -1, lambda: -1, errorCode: -1})
+  const [mode, setMode] = useState<Mode>(Mode.Gauge)
 
   async function tryConnect() {
     try {
@@ -51,22 +57,22 @@ function App() {
     }
 
     if (state.stateId === States.Warmup) {
-      return <WarmupGauge warmup={state.warmup}></WarmupGauge>
+      return <WarmupGauge warmup={state.warmup!}></WarmupGauge>
     }
 
     if (state.stateId === States.Normal) {
-      return <AfrGauge afr={state.afr}></AfrGauge>
+      return <AfrGauge afr={state.afr!}></AfrGauge>
     }
     
     if (state.stateId === States.Error) {
-      const errorDescription = ErrorDescriptions[state.errorCode];
+      const errorDescription = ErrorDescriptions[state.errorCode!]
      
       return <span>Error: {errorDescription}</span>
     }
   }
 
-  function updated({state: newState, prevState}) {
-
+  function updated({state: newState, prevState}:StateChange) {
+ 
     const newStateName = StateDescriptions[newState.stateId]
     const oldStateName = StateDescriptions[prevState.stateId]
 
@@ -74,19 +80,23 @@ function App() {
       console.log(`State Changed from ${oldStateName} to ${newStateName}`)
     }
 
-    //debugger
     setState(newState)
   }
 
 
-  async function handleNavEvent(navId) {
-    if (navId === 'connect') { 
+  async function handleNavEvent(navId: string) {
+    if (navId === 'connect') 
       tryConnect()
-    }
-    if (navId === 'gauge') {}
-    if (navId === 'graph') {}
-    if (navId === 'mockUpdate') mockUpdate()
-}
+    
+    if (navId === 'gauge')
+      setMode(Mode.Gauge)
+    
+    if (navId === 'graph')
+      setMode(Mode.Graph)
+    
+    if (navId === 'mockUpdate') 
+      mockUpdate()
+  }
 
   addEventListener('update', updated)
 

@@ -1,4 +1,6 @@
-export function createWorker(rawDataHandler) {
+import { RawDataHandler } from './rawDataHandler'
+
+export function createWorker(rawDataHandler: RawDataHandler) : Worker {
 
   const worker = new Worker(new URL('./serialWorker', import.meta.url), {type: 'module'}) 
   

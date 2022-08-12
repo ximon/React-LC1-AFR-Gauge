@@ -1,7 +1,9 @@
 import { State, States, Errors, AfrRange} from './LC1Data'
 
 const INITIAL_PACKETCOUNT = 2
-const PACKET_CHECK = [ 0xA2, 0x80, 0x42, 0x00, 0x00, 0x00 ]
+const PACKET_CHECK = [ 0xB2, 0x80, 0x42, 0x00, 0x00, 0x00 ]
+
+
 
 const eventListeners = new Map<string, Function>()
 
@@ -61,8 +63,8 @@ function processData(data: number)
 function parsePackets()
 {
     const stateId = (packet[2] & 0b00011100) >> 2  // F2-F0
-    const afrMult = ((packet[2] & 0b00000001) << 7) + (packet[3] & 0b01111111)           // AF7, AF6-AF0
-    const lambda = ((packet[4] & 0b00111111) << 7) + (packet[5] & 0b01111111)        // L12-L7, L6-L0  
+    const afrMultiplier = ((packet[2] & 0b00000001) << 7) + (packet[3] & 0b01111111)           // AF7, AF6-AF0
+    const lambdaWord = ((packet[4] & 0b00111111) << 7) + (packet[5] & 0b01111111)        // L12-L7, L6-L0  
 
     prevState = {...state};
     state = {stateId: stateId};
@@ -70,27 +72,30 @@ function parsePackets()
     switch(stateId)
     {
         case States.Warmup:
-            state = {...state, warmup: lambda / 10}
+            state = {...state, warmup: lambdaWord / 10}
             break
 
         case States.O2:
-            state = {...state, o2: lambda / 10}
+            state = {...state, o2: lambdaWord / 10}
             break
 
         case States.Normal:
+            const lambda = (lambdaWord + 500) / 1000
+            const afr = lambda * (afrMultiplier / 10) //AFR = ((L12..L0) + 500) * (AF7..AF0) / 10000
+
             state = {
                 ...state,
-                lambda: (lambda + 500) / 1000,
-                afr: lambda * (afrMult / 10) //AFR = ((L12..L0) + 500) * (AF7..AF0) / 10000
+                lambda,
+                afr
             }
             break
 
         case States.HeaterCalibration:
-            state = {...state, calibrationCountdown: lambda}
+            state = {...state, calibrationCountdown: lambdaWord}
             break
 
         case States.Error:
-            state = {...state, errorCode: lambda}
+            state = {...state, errorCode: lambdaWord}
             break
     }
     

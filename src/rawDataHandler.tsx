@@ -1,0 +1,1 @@
+export type RawDataHandler = (data:number) => void
