@@ -19,7 +19,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "parcel build public/index.html --no-source-maps --public-url ./",
     "start": "parcel public/index.html",
     "test": "npm run build && web-test-runner \"src/**/*.test.js\" --node-resolve",
     "testCoverage": "web-test-runner \"src/**/*.test.js\" --node-resolve --coverage"
