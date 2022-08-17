@@ -42,11 +42,11 @@ describe('should decode the data', () => {
         expect(state.warmup).equal(66)
     })
 
-    it('the state shoule be error with a code of 9', () => {
+    it('the state should be error with a code of 9', () => {
         processData(0xb2)
         processData(0x82)
-        processData(0x5b)
-        processData(0x13)
+        processData(0x5a)
+        processData(0x00)
         processData(0x00)
         processData(0x09)
     })
